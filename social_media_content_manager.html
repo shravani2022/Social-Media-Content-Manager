@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Content Manager</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Social Media Content Manager</h1>
+            <p>Optimize your social media content with AI-powered insights</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <h2>Create New Post</h2>
+                <form id="postForm">
+                    <div class="form-group">
+                        <label for="platform">Platform</label>
+                        <select id="platform" required>
+                            <option value="twitter">Twitter</option>
+                            <option value="facebook">Facebook</option>
+                            <option value="linkedin">LinkedIn</option>
+                            <option value="instagram">Instagram</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="content">Content</label>
+                        <textarea id="content" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="scheduledTime">Schedule Time</label>
+                        <input type="datetime-local" id="scheduledTime" required>
+                    </div>
+                    <button type="submit" class="btn">Analyze & Schedule</button>
+                </form>
+                <div id="sentimentPreview" class="sentiment-indicator"></div>
+            </div>
+
+            <div class="card">
+                <h2>Performance Overview</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Posts</h3>
+                        <p id="totalPosts">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Avg. Engagement</h3>
+                        <p id="avgEngagement">0%</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Sentiment Score</h3>
+                        <p id="avgSentiment">0.0</p>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="engagementChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <h2>Scheduled Posts</h2>
+                <div id="scheduledPosts" class="post-list"></div>
+            </div>
+
+            <div class="card">
+                <h2>Recommendations</h2>
+                <div id="recommendations"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize charts
+        const ctx = document.getElementById('engagementChart').getContext('2d');
+        const engagementChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Engagement Rate',
+                    data: [65, 59, 80, 81, 56, 55, 40],
+                    fill: false,
+                    borderColor: '#4a90e2',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Post form handling
+        document.getElementById('postForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                platform: document.getElementById('platform').value,
+                content: document.getElementById('content').value,
+                scheduledTime: document.getElementById('scheduledTime').value
+            };
+
+            // Simulate API call for sentiment analysis
+            const sentiment = await analyzeSentiment(formData.content);
+            updateSentimentPreview(sentiment);
+
+            // Simulate post scheduling
+            schedulePost(formData);
+        });
+
+        async function analyzeSentiment(content) {
+            // Simulate sentiment analysis
+            const score = Math.random() * 2 - 1; // Random score between -1 and 1
+            return {
+                score,
+                label: score > 0 ? 'Positive' : score < 0 ? 'Negative' : 'Neutral'
+            };
+        }
+
+        function updateSentimentPreview(sentiment) {
+            const preview = document.getElementById('sentimentPreview');
+            const color = sentiment.score > 0 ? '#2ecc71' : sentiment.score < 0 ? '#e74c3c' : '#f1c40f';
+            
+            preview.innerHTML = `
+                <div class="sentiment-score" style="background-color: ${color}">
+                    ${sentiment.score.toFixed(2)}
+                </div>
+                <span>${sentiment.label} Sentiment</span>
+            `;
+        }
+
+        function schedulePost(formData) {
+            const postsList = document.getElementById('scheduledPosts');
+            const postElement = document.createElement('div');
+            postElement.className = 'post-item';
+            
+            postElement.innerHTML = `
+                <strong>${formData.platform}</strong>
+                <p>${formData.content}</p>
+                <small>Scheduled for: ${new Date(formData.scheduledTime).toLocaleString()}</small>
+            `;
+            
+            postsList.appendChild(postElement);
+            
+            // Update stats
+            updateStats();
+        }
+
+        function updateStats() {
+            const totalPosts = document.getElementById('totalPosts');
+            const avgEngagement = document.getElementById('avgEngagement');
+            const avgSentiment = document.getElementById('avgSentiment');
+            
+            // Simulate updating stats
+            totalPosts.textContent = parseInt(totalPosts.textContent) + 1;
+            avgEngagement.textContent = (Math.random() * 5 + 2).toFixed(1) + '%';
+            avgSentiment.textContent = (Math.random() * 2 - 1).toFixed(2);
+        }
+
+        // Initialize recommendations
+        document.getElementById('recommendations').innerHTML = `
+            <ul style="list-style: none; padding: 0;">
+                <li style="margin-bottom: 10px;">✨ Best time to post: 9:00 AM - 11:00 AM</li>
+                <li style="margin-bottom: 10px;">📈 Increase hashtag usage for better reach</li>
+                <li style="margin-bottom: 10px;">🎯 Focus on educational content for higher engagement</li>
+                <li style="margin-bottom: 10px;">🔄 Maintain consistent posting schedule</li>
+            </ul>
+        `;
+    </script>
+</body>
+</html>
